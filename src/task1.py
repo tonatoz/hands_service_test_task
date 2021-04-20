@@ -13,11 +13,13 @@ DEFAULT_MOSCOW_PREFIX = ["8", "4", "9", "5"]
 
 
 async def fetch(session: ClientSession, url: str) -> str:
+    """Get content of HTML page from given url"""
     resp = await session.get(url)
     return await resp.text()
 
 
 def fix_format(text) -> str:
+    """Change string to target format 8KKKNNNNNNN"""
     clean_phone = list(re.sub(r"[^0-9]", "", text))
     if len(clean_phone) == 10:
         clean_phone.insert(0, "8")
@@ -28,7 +30,8 @@ def fix_format(text) -> str:
     return "".join(clean_phone)
 
 
-async def process(session: ClientSession, url: str) -> ParsingResult:
+async def process_page(session: ClientSession, url: str) -> ParsingResult:
+    """Convert url to url + phones"""
     try:
         html = await fetch(session, url)
         texts = BeautifulSoup(html, "lxml").findAll(text=PHONE_PATTERN)
@@ -40,12 +43,14 @@ async def process(session: ClientSession, url: str) -> ParsingResult:
 
 
 async def main(urls: list[str]) -> list[ParsingResult]:
+    """Running all parsign tasks at async way"""
     async with ClientSession() as session:
-        tasks = [create_task(process(session, url)) for url in urls]
+        tasks = [create_task(process_page(session, url)) for url in urls]
         return await gather(*tasks)
 
 
 def run(urls: list[str]) -> list[ParsingResult]:
+    """Sync run"""
     loop = get_event_loop()
     try:
         return loop.run_until_complete(main(urls))
