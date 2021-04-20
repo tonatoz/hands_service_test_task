@@ -4,6 +4,7 @@ from aiohttp import ClientSession
 from bs4 import BeautifulSoup
 from loguru import logger
 
+ParsingResult = tuple[str, set[str]]
 
 PHONE_PATTERN = re.compile(
     r"^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$"
@@ -27,7 +28,7 @@ def fix_format(text) -> str:
     return "".join(clean_phone)
 
 
-async def process(session: ClientSession, url: str) -> tuple[str, set[str]]:
+async def process(session: ClientSession, url: str) -> ParsingResult:
     try:
         html = await fetch(session, url)
         texts = BeautifulSoup(html, "lxml").findAll(text=PHONE_PATTERN)
@@ -38,13 +39,13 @@ async def process(session: ClientSession, url: str) -> tuple[str, set[str]]:
         return url, []
 
 
-async def main(urls: list[str]) -> list[tuple[str, set[str]]]:
+async def main(urls: list[str]) -> list[ParsingResult]:
     async with ClientSession() as session:
         tasks = [create_task(process(session, url)) for url in urls]
         return await gather(*tasks)
 
 
-def run(urls: list[str]) -> list[tuple[str, set[str]]]:
+def run(urls: list[str]) -> list[ParsingResult]:
     loop = get_event_loop()
     try:
         return loop.run_until_complete(main(urls))
