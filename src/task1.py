@@ -1,13 +1,14 @@
 import re
-from aiohttp import ClientSession
 from asyncio import get_event_loop, create_task, gather
+from aiohttp import ClientSession
 from bs4 import BeautifulSoup
 from loguru import logger
 
 
-phone_pattern = re.compile(
+PHONE_PATTERN = re.compile(
     r"^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$"
 )
+DEFAULT_MOSCOW_PREFIX = ["8", "4", "9", "5"]
 
 
 async def fetch(session: ClientSession, url: str) -> str:
@@ -20,7 +21,7 @@ def fix_format(text) -> str:
     if len(clean_phone) == 10:
         clean_phone.insert(0, "8")
     elif len(clean_phone) == 7:
-        clean_phone = ["8", "4", "9", "5"] + clean_phone
+        clean_phone = DEFAULT_MOSCOW_PREFIX + clean_phone
     elif clean_phone[0] == "7":
         clean_phone[0] = "8"
     return "".join(clean_phone)
@@ -29,11 +30,11 @@ def fix_format(text) -> str:
 async def process(session: ClientSession, url: str) -> tuple[str, set[str]]:
     try:
         html = await fetch(session, url)
-        texts = BeautifulSoup(html, "lxml").findAll(text=phone_pattern)
+        texts = BeautifulSoup(html, "lxml").findAll(text=PHONE_PATTERN)
         phones = [fix_format(t) for t in texts]
         return (url, set(phones))
-    except Exception as e:
-        logger.error(e)
+    except Exception as err:
+        logger.error(err)
         return url, []
 
 
@@ -43,9 +44,10 @@ async def main(urls: list[str]) -> list[tuple[str, set[str]]]:
         return await gather(*tasks)
 
 
-def run(urls: list[str]):
+def run(urls: list[str]) -> list[tuple[str, set[str]]]:
     loop = get_event_loop()
     try:
         return loop.run_until_complete(main(urls))
     except:
         logger.exception("Error")
+        return []

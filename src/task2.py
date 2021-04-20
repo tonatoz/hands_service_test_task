@@ -1,12 +1,11 @@
 from collections import OrderedDict
 
-x = [1, 4, 7, 6, 6, 2, 8, 12, 4]
 
-# Simpel - using set
-def distinct(x):
-    return list(set(x))
+def distinct(seq: list) -> list:
+    """Simple distinct"""
+    return list(set(seq))
 
 
-# Saving order usign collections
-def distinct_with_order(x):
-    return list(OrderedDict.fromkeys(x))
+def distinct_with_order(seq: list) -> list:
+    """Distinc with saving original order"""
+    return list(OrderedDict.fromkeys(seq))
