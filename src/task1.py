@@ -15,7 +15,7 @@ async def fetch(session: ClientSession, url: str) -> str:
     return await resp.text()
 
 
-def fix_format(text):
+def fix_format(text) -> str:
     clean_phone = list(re.sub(r"[^0-9]", "", text))
     if len(clean_phone) == 10:
         clean_phone.insert(0, "8")
@@ -26,31 +26,26 @@ def fix_format(text):
     return "".join(clean_phone)
 
 
-async def process(session: ClientSession, url: str) -> tuple[str, list[str]]:
+async def process(session: ClientSession, url: str) -> tuple[str, set[str]]:
     try:
         html = await fetch(session, url)
         texts = BeautifulSoup(html, "lxml").findAll(text=phone_pattern)
-        return url, [fix_format(t) for t in texts]
+        phones = [fix_format(t) for t in texts]
+        return (url, set(phones))
     except Exception as e:
         logger.error(e)
         return url, []
 
 
-async def main(urls: list[str]):
+async def main(urls: list[str]) -> list[tuple[str, set[str]]]:
     async with ClientSession() as session:
         tasks = [create_task(process(session, url)) for url in urls]
-        results = await gather(*tasks)
-        return results
+        return await gather(*tasks)
 
 
-def run(organizations):
+def run(urls: list[str]):
     loop = get_event_loop()
     try:
-        loop.run_until_complete(main(organizations))
+        return loop.run_until_complete(main(urls))
     except:
         logger.exception("Error")
-
-
-if __name__ == "__main__":
-    organizations = ["https://masterdel.ru/", "https://repetitors.info/"]
-    run(organizations)
