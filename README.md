@@ -15,7 +15,7 @@ x = [1,4,7,6,6,2,8,12,4]
 
 # Запуск
 ## Установка зависимостей
-Через (Poetry dependency manager)[https://python-poetry.org/]
+Через [Poetry dependency manager](https://python-poetry.org/)
 ```poetry install```
 
 ## Запустить задачу
