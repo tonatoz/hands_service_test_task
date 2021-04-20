@@ -16,6 +16,7 @@ x = [1,4,7,6,6,2,8,12,4]
 # Запуск
 ## Установка зависимостей
 Через [Poetry dependency manager](https://python-poetry.org/)
+
 ```poetry install```
 
 ## Запустить задачу
@@ -25,5 +26,6 @@ python ./src/task1.py
 python ./src/task2.py
 ```
 
-Запуск тестов (весьма скромных)
+## Запуск тестов (весьма скромных)
+
 ```python -m pytest```
