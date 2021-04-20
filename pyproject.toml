@@ -6,6 +6,11 @@ authors = ["Anton <tonatoz@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+aiohttp = "^3.7.4"
+asyncio = "^3.4.3"
+beautifulsoup4 = "^4.9.3"
+loguru = "^0.5.3"
+
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.6"
