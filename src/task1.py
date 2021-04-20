@@ -57,3 +57,8 @@ def run(urls: list[str]) -> list[ParsingResult]:
     except:
         logger.exception("Error")
         return []
+
+
+if __name__ == "__main__":
+    logger.debug(run(["https://masterdel.ru/", "https://repetitors.info/"]))
+    
