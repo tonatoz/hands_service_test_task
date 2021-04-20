@@ -8,7 +8,6 @@ authors = ["Anton <tonatoz@gmail.com>"]
 python = "^3.9"
 aiohttp = "^3.7.4"
 asyncio = "^3.4.3"
-beautifulsoup4 = "^4.9.3"
 loguru = "^0.5.3"
 
 
